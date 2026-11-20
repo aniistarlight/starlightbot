@@ -2,3 +2,4 @@ discord.py
 python-dotenv
 mctools
 pet-pet-gif
+pillow==11.3.0
