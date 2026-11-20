@@ -294,6 +294,38 @@ async def weather(
     except Exception as exc:
         await ctx.send(f"⚠️ Failed to change weather: `{exc}`")
 
+@bot.command()
+async def update(ctx: commands.Context, title: str, *, body: str):
+    if not is_weather_admin(ctx):
+        await ctx.reply("You don't have permission to use this command.")
+        return
+
+    if len(title) > 256:
+        await ctx.reply("Title must be 256 characters or fewer.")
+        return
+
+    if len(body) > 4096:
+        await ctx.reply("Body must be 4096 characters or fewer.")
+        return
+
+    embed = discord.Embed(
+        title=title,
+        description=body,
+        color=discord.Color.blurple(),
+        timestamp=discord.utils.utcnow(),
+    )
+    embed.set_footer(text="StarlightCraft")
+
+    await ctx.send(embed=embed)
+
+    try:
+        await ctx.message.delete()
+    except discord.Forbidden:
+        await ctx.send(
+            "⚠️ Posted, but I couldn't delete your message. "
+            "I need the **Manage Messages** permission.",
+            delete_after=10,
+        )
 
 # ---------------------------------------------------------------------------
 # Petpet command
