@@ -358,6 +358,73 @@ async def pet(
     except Exception as exc:
         await ctx.send(f"⚠️ Could not create the petpet GIF: `{exc}`")
 
+async def post_status_embed(
+    ctx: commands.Context,
+    title: str,
+    body: str,
+    *,
+    label: str,
+    color: discord.Color,
+):
+    """Post a color-coded status embed, then delete the invoking message."""
+    if not is_weather_admin(ctx):
+        await ctx.reply("You don't have permission to use this command.")
+        return
+
+    if len(title) > 256:
+        await ctx.reply("Title must be 256 characters or fewer.")
+        return
+
+    if len(body) > 4096:
+        await ctx.reply("Body must be 4096 characters or fewer.")
+        return
+
+    embed = discord.Embed(
+        title=title,
+        description=body,
+        color=color,
+        timestamp=discord.utils.utcnow(),
+    )
+    embed.set_author(name=label)
+    embed.set_footer(text="StarlightCraft")
+
+    await ctx.send(embed=embed)
+
+    try:
+        await ctx.message.delete()
+    except discord.Forbidden:
+        await ctx.send(
+            "⚠️ Posted, but I couldn't delete your message. "
+            "I need the **Manage Messages** permission.",
+            delete_after=10,
+        )
+
+
+@bot.command()
+async def issue(ctx: commands.Context, title: str, *, body: str):
+    await post_status_embed(
+        ctx, title, body,
+        label="🔴 Issue Reported",
+        color=discord.Color.red(),
+    )
+
+
+@bot.command()
+async def investigating(ctx: commands.Context, title: str, *, body: str):
+    await post_status_embed(
+        ctx, title, body,
+        label="🟠 Investigating",
+        color=discord.Color.orange(),
+    )
+
+
+@bot.command()
+async def resolved(ctx: commands.Context, title: str, *, body: str):
+    await post_status_embed(
+        ctx, title, body,
+        label="🟢 Resolved",
+        color=discord.Color.green(),
+    )
 
 if __name__ == "__main__":
     bot.run(DISCORD_TOKEN)
