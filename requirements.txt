@@ -3,3 +3,4 @@ python-dotenv
 mctools
 pet-pet-gif
 pillow==11.3.0
+setuptools<82
